@@ -69,8 +69,8 @@ class Car:
             self.car_moved_center = rect.center
             self.car_moved_offset = self._calculate_image_offset(self.car_moved)
 
-        if action == 4:
-            self._speed += 1
+        # if action == 3 and self._speed < 7:
+        #     self._speed += 1
 
         x = math.sin(math.radians(self._angle)) * self._speed
         y = math.cos(math.radians(self._angle)) * self._speed
@@ -111,6 +111,9 @@ class Car:
 
         self.position = self._car_origin_center
 
+    def get_speed(self):
+        return self._speed
+
     @property
     def angle(self):
         return self._angle
@@ -139,7 +142,7 @@ class RaceTrack:
         return self._track
 
 class CarRadars:
-    MAX_LEN = 30
+    MAX_LEN = 50
     def __init__(self, ) -> None:
         self._radars = [
             [(0,0), 0, -90],
@@ -185,7 +188,7 @@ class CarRadars:
 
 class CarGame2D:
     def __init__(self) -> None:
-        self.track = RaceTrack("mapa2.png")
+        self.track = RaceTrack("mapa3.png")
         self.car = Car(self.track.get_start())
         self.radars = CarRadars()
         screen_size = self.track.get_size()
@@ -233,6 +236,7 @@ class CarGame2D:
     def evaluate(self):
         radars_len = self.radars.get_radars_length()
         reward = (sum(radars_len) / 100)   # sum of radar lengths (max 150) / 100 -> max 1.5
+        reward += self.car.get_speed() * 10
 
         if self._finish is True:
             self._reward += 1000
@@ -260,14 +264,16 @@ class CarGame2D:
     def view(self):
         self.track.draw(self.screen)
         self.car.draw(self.screen)
-        self.radars.draw(self.screen, self.car.position)
+        # self.radars.draw(self.screen, self.car.position)
 
         corner = self.car.get_corners()
         for i in corner:
             pygame.draw.circle(self.screen, (123, 200, 255), i, 1)
 
         reward_text = self.font.render("Reward: %.2f" % self._reward, False, (255, 123, 123))
+        speed_text = self.font.render("Speed: %.2f" % self.car.get_speed(), False, (255, 123, 123))
         self.screen.blit(reward_text, self.reward_text_pos)
+        self.screen.blit(speed_text, (self.reward_text_pos[0], 40))
         pygame.display.flip()
         self.clock.tick(60)
 

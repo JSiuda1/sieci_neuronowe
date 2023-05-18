@@ -6,7 +6,7 @@ from racing_car_game import CarGame2D
 class RacingCarEnv(Env):
     def __init__(self) -> None:
         self.action_space = spaces.Discrete(3)
-        self.observation_space = spaces.Box(np.array([0, 0, 0, 0, 0]), np.array([30, 30, 30, 30, 30]), dtype=np.float32)
+        self.observation_space = spaces.Box(np.array([0, 0, 0, 0, 0]), np.array([50, 50, 50, 50, 50]), dtype=np.float32)
         self.car_game = CarGame2D()
 
     def reset(self):
