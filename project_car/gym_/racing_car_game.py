@@ -146,9 +146,9 @@ class CarRadars:
     def __init__(self, ) -> None:
         self._radars = [
             [(0,0), 0, -90],
-            [(0,0), 0, -45],
+            # [(0,0), 0, -45],
             [(0,0), 0,   0],
-            [(0,0), 0,  45],
+            # [(0,0), 0,  45],
             [(0,0), 0,  90],
         ]
 
@@ -192,14 +192,18 @@ class CarGame2D:
         self.car = Car(self.track.get_start())
         self.radars = CarRadars()
         screen_size = self.track.get_size()
-        self.screen = pygame.display.set_mode(screen_size)
         self.reward_text_pos = (screen_size[0] - 150, 10)
-        self.clock = pygame.time.Clock()
         self._colision = False
         self._finish = False
         self._reward = 0
-        pygame.init()
-        self.font = pygame.font.SysFont("comicsansms", 24)
+
+
+    def start_visualization(self):
+        if pygame.get_init() is False:
+            pygame.init()
+            self.font = pygame.font.SysFont("comicsansms", 24)
+            self.clock = pygame.time.Clock()
+            self.screen = pygame.display.set_mode(self.track.get_size())
 
 
     def check_exit(self):
@@ -235,12 +239,15 @@ class CarGame2D:
 
     def evaluate(self):
         radars_len = self.radars.get_radars_length()
-        reward = (sum(radars_len) / 100)   # sum of radar lengths (max 150) / 100 -> max 1.5
+        reward = (sum(radars_len) / 1000)   # sum of radar lengths (max 150) / 100 -> max 1.5
         reward += self.car.get_speed() * 10
 
         if self._finish is True:
             self._reward += 1000
         self._reward += reward
+
+        if self._colision is True:
+            self._reward -= 1000
 
         return reward
 
@@ -264,7 +271,7 @@ class CarGame2D:
     def view(self):
         self.track.draw(self.screen)
         self.car.draw(self.screen)
-        # self.radars.draw(self.screen, self.car.position)
+        self.radars.draw(self.screen, self.car.position)
 
         corner = self.car.get_corners()
         for i in corner:
@@ -278,7 +285,8 @@ class CarGame2D:
         self.clock.tick(60)
 
     def close(self):
-        pygame.quit()
+        if pygame.get_init() is True:
+            pygame.quit()
 
 
 if __name__ == "__main__":

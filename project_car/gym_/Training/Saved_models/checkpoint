@@ -1,0 +1,2 @@
+model_checkpoint_path: "car_model_custom"
+all_model_checkpoint_paths: "car_model_custom"
